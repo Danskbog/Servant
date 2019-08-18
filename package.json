@@ -1,0 +1,25 @@
+{
+  "name": "Servant",
+  "version": "2.6.0",
+  "description": "Moderation and promotion bot for dutch beat saber discord.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "dependencies": {
+    "bufferutil": "^3.0.3",
+    "chalk": "^2.3.0",
+    "discord.js": "^11.3.0",
+    "enmap": "^0.4.2",
+    "enmap-level": "^1.0.0",
+    "jimp": "^0.2.28",
+    "moment": "^2.20.1",
+    "moment-duration-format": "^2.2.0",
+    "nodemon": "^1.17.2",
+    "request": "^2.88.0",
+    "util": "^0.10.3"
+  }
+}

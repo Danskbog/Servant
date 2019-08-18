@@ -1,0 +1,84 @@
+const Discord = require("discord.js");
+const Jimp = require('jimp');
+
+exports.run = async (client, message, args, level) => {
+  message.delete();
+
+  const link = args[0];
+  const requests = message.guild.channels.find("name", "emoji-requests");
+
+  if (!link) return message.reply('Please provide a link of the image.');
+  const asd = link.substr(link.length - 4);
+  if (!asd === ".jpg" || !asd === ".png") return message.reply('Make sure that the last 3 letters of the link is the file extension.');
+
+  const response = await client.awaitReply(message, "Please type in chat a name for the emoji!");
+  if (typeof response === 'string' || response instanceof String) {
+    const embed = new Discord.RichEmbed()
+    .setColor('RANDOM')
+    .setThumbnail(`${link}`)
+    .setAuthor(`${message.author.tag}`, `${message.author.avatarURL}`)
+    .setDescription("**A new request has arrived!** <@223575372611059722>!")
+    .addField("**Emoji name:**", `__${response}__`, true);
+
+    message.guild.channels.get(requests.id).send({embed}).then(function (msg) {
+      msg.react('✅').then(function () {
+        msg.react("❌");
+      }).catch(console.error);
+
+      message.reply('request has succesfully been submitted!').then((sent) => {
+          sent.delete(2500);
+      });
+
+      msg.awaitReactions((reaction, user) => {
+        if (user.id === "223575372611059722") {
+          if (reaction.emoji.name === '✅') {
+            Jimp.read(link).then(img => {
+              img
+                .autocrop()
+                .resize(Jimp.AUTO, 32)
+                .getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+                  message.guild.createEmoji(buffer, `${response}`);
+                });
+            });
+
+            const approved = new Discord.RichEmbed()
+            .setColor('0x7CFC00')
+            .setThumbnail(`${link}`)
+            .setAuthor(`${message.author.tag}`, `${message.author.avatarURL}`)
+            .setDescription("**This emoji request has been Approved!**")
+            .addField("**Emoji name:**", `__${response}__`, true);
+
+            msg.edit(``, approved);
+          }
+          else if (reaction.emoji.name === '❌') {
+            const denied = new Discord.RichEmbed()
+            .setColor('0xFF0000')
+            .setThumbnail(`${link}`)
+            .setAuthor(`${message.author.tag}`, `${message.author.avatarURL}`)
+            .setDescription("**This emoji request has been Denied!**")
+            .addField("**Emoji name:**", `__${response}__`, true);
+
+            msg.edit(``, denied);
+          }
+        }
+      });
+    });
+  }
+  else {
+    message.reply("That doesn't seem to be text.");
+  }
+};
+
+exports.conf = {
+  enabled: true,
+  guildOnly: true,
+  aliases: [],
+  permLevel: "User"
+};
+
+exports.help = {
+  name: "request",
+  category: "Miscellaneous",
+  description: "Request for a custom emoji.",
+  usage: "request [link]"
+};

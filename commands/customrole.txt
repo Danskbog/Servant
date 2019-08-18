@@ -1,0 +1,47 @@
+const Discord = require ("discord.js");
+
+exports.run = async (client, message, [mention, rolename, color], level) => {
+  message.delete();
+
+  const settings = client.settings.get(message.guild.id);
+  const rolePos = settings.customrolePos;
+  const blet = message.mentions.members.first() || message.guild.members.get(mention);
+  const allow = message.guild.roles.find('name', settings.requiredRole);
+  if (!blet) return message.reply("please provide a valid user.");
+  if (!rolename) return message.reply("you must specify a name for the custom role.");
+  if (!color) return message.reply("you must provide a color code for the custom role!");
+  if (!blet.roles.has(allow.id)) return message.reply('this user is not allowed to have a custom role yet! (You have to be __Talkative Kawaii__)');
+  const isHexColor = /(^#[0-9A-F]{6}$)/i.test(color);
+  if (isHexColor === false) return message.reply("The hex color you provided is invalid.");
+
+  message.guild.createRole({
+    name: rolename,
+    color: color,
+    position: rolePos,
+    permissions: []
+  }).then((idk) => {
+    message.reply(`the role has succesfully been created with the name ${rolename} and the color ${color}`).then((lul) => {
+      lul.delete(1000);
+    });
+    const customrole = message.guild.roles.find('name', rolename);
+    blet.addRole(customrole).then(() => {
+      message.channel.send(`The role ${rolename} has succesfully been given to ${blet}!\nYou are allowed to request any changes to ur role whenever u want!`).then((pleb) => {
+        pleb.delete(50000);
+      });
+    });
+  });
+};
+
+exports.conf = {
+  enabled: true,
+  guildOnly: false,
+  aliases: [],
+  permLevel: "Bot Owner"
+};
+
+exports.help = {
+  name: "customrole",
+  category: "Moderation",
+  description: "Creates a custom role and gives it to the user.",
+  usage: "customrole [user] [rolename] [hexcolor]"
+};

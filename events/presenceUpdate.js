@@ -47,7 +47,7 @@ module.exports = async (client, oldMember, newMember) => {
   const streamStat = game.streaming;
 
   if (streamStat) {
-    const clientId = 'iv0p2rfrqqqs6e23d12e1mr07a7h7h';
+    const clientId = '<twitch api here>';
     const stremerurl = game.url;
     if (!stremerurl) return;
     const stremer = stremerurl.substr(22);
